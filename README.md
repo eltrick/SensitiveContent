@@ -1,13 +1,11 @@
 # SensitiveContent
-A custom[-ish] combined implementation of Diffie-Hellman, AES and/or RSA to facilitate manual encrypted exchanges.
+A custom[-ish] combined implementation of Diffie-Hellman and a double ratchet using AES+HMAC to facilitate manual encrypted exchanges.
 ## Requirements
 - To build, install .NET 10 SDK.
 - To run, install .NET 10 Desktop Runtime.
 
 Available at [.NET 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 ## Expected common usage pipeline:
-1. Run the program, which generates an RSA and Elliptic Curve Diffie-Hellman key pair in the printed location.
-1.  1. If following the ECDH pipeline, send each other your public keys, and use them in conjunction with the private keys to derive AES keys for encryption
-	1. If following the RSA pipeline, send a public key, the other person uses it to encrypt an AES key to be sent back.
-1. Use the corresponding options to derive/unwrap keys. Now both parties have the same AES key to be used to encrypt messages and/or files.
-1. Depending on whether encrypted exchanges need to be recoverable, store the private keys somewhere safe or delete them afterwards.
+1. Run the program, which prompts for whether it should send messages first [only one out of two instances should send messages first], initialises a double ratchet, and prints instructions corresponding to each side.
+1. If requested, retrieve the recipient's public key, paste into the window, and press Enter to initialise the cipher state.
+1. Encrypt/Decrypt some text and/or a file using the shown options [if encrypting/decrypting a file, its path can be entered by dragging the file into the window]
