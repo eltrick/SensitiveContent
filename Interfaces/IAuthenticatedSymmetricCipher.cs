@@ -38,12 +38,6 @@
         /// <returns>An array of key lengths, in bytes, for each key the cipher uses.</returns>
         public int[] GetKeyLengths();
 
-        /// <summary>
-        /// Gets the iterations to be used per key.
-        /// </summary>
-        /// <returns>An array of iteration counts, for each key the cipher uses.</returns>
-        public int[] GetIterationCounts();
-
         public string KeyChecksum();
     }
 }

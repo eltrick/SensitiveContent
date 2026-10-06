@@ -19,7 +19,7 @@ void ImportRecipientPK(bool init)
     do
     {
         Console.Clear();
-        Console.Write("PK: ");
+        Console.Write("Enter the received public key: ");
 
         try
         {

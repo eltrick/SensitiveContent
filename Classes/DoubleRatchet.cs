@@ -3,10 +3,10 @@ using System.Security.Cryptography;
 
 namespace SensitiveContent.Classes
 {
+    // Note: I don't think this is the double ratchet that Signal uses. Signal uses a centralised key server to store key material used to derive root keys to initialise its state. Since this is entirely offline, keys are initially derived purely from the sent DHPK.
     internal class DoubleRatchet(IAuthenticatedSymmetricCipher sendingCipher, IAuthenticatedSymmetricCipher receivingCipher)
     {
-        private const byte _keyDerivationKeyId = 0;
-        private const int _keyDerivationKeyLength = 32, _keyDerivationKeyIterations = 1;
+        private const int _keyDerivationKeyLength = 32;
         private byte _sendingNumber = 0, _receivingNumber = 0, _previousNumber = 0;
         private byte[] _keyDerivationKey = RandomNumberGenerator.GetBytes(_keyDerivationKeyLength);
         private byte[] _sendingChainKey = new byte[32];
@@ -75,6 +75,8 @@ namespace SensitiveContent.Classes
 
             UpdateReceivingKeys();
 
+            _previousNumber = _sendingNumber;
+            _sendingNumber = 0;
             _receivingNumber = n;
 
             return _receivingCipher.Decrypt(blob).Item1;
@@ -93,19 +95,19 @@ namespace SensitiveContent.Classes
 
         private void UpdateSendingKeys()
         {
-            _sendingChainKey = Kdf.DeriveBytes(_sendingChainKey, [_keyDerivationKeyId], _keyDerivationKeyIterations, _keyDerivationKeyLength);
-            _sendingCipher.UpdateKeys(Kdf.DeriveBytes(_sendingChainKey, _sendingCipher.GetIterationCounts(), _sendingCipher.GetKeyLengths()));
+            _sendingChainKey = Kdf.DeriveBytes(_sendingChainKey, _keyDerivationKeyLength);
+            _sendingCipher.UpdateKeys(Kdf.DeriveBytes(_sendingChainKey, _sendingCipher.GetKeyLengths()));
         }
 
         private void UpdateReceivingKeys()
         {
-            _receivingChainKey = Kdf.DeriveBytes(_receivingChainKey, [_keyDerivationKeyId], _keyDerivationKeyIterations, _keyDerivationKeyLength);
-            _receivingCipher.UpdateKeys(Kdf.DeriveBytes(_receivingChainKey, _receivingCipher.GetIterationCounts(), _receivingCipher.GetKeyLengths()));
+            _receivingChainKey = Kdf.DeriveBytes(_receivingChainKey, _keyDerivationKeyLength);
+            _receivingCipher.UpdateKeys(Kdf.DeriveBytes(_receivingChainKey, _receivingCipher.GetKeyLengths()));
         }
 
         private void UpdateKeyDerivationKey()
         {
-            _keyDerivationKey = Kdf.DeriveBytes(_keyDerivationKey, [_keyDerivationKeyId], _keyDerivationKeyIterations, _keyDerivationKeyLength);
+            _keyDerivationKey = Kdf.DeriveBytes(_keyDerivationKey, _keyDerivationKeyLength);
         }
 
         public void Init(Ecdh second)

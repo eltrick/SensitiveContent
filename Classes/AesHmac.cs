@@ -9,7 +9,6 @@ namespace SensitiveContent.Classes
         private static readonly int _maxKeysInHistory = 32;
         private const string _keyCheckMagic = "verify_key_aes";
         private static readonly int[] _keyLengths = [32, 64];
-        private static readonly int[] _iterationCounts = [1, 1];
         private readonly List<byte[][]> _keyHistory = [];
         private readonly Aes _aes;
         private readonly HMACSHA256 _hmac;
@@ -45,11 +44,6 @@ namespace SensitiveContent.Classes
         public int[] GetKeyLengths()
         {
             return _keyLengths;
-        }
-
-        public int[] GetIterationCounts()
-        {
-            return _iterationCounts;
         }
 
         private void UpdateKeysTemp(params byte[][] keys)
